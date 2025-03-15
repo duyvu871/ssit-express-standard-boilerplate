@@ -12,7 +12,7 @@ A robust, production-ready Express.js server boilerplate with TypeScript, Prisma
 - **Prisma ORM**: Modern database toolkit for PostgreSQL
 - **Error Handling**: Centralized error handling with custom error classes
 - **Request Validation**: Input validation using Zod schema
-- **API Documentation**: Well-documented API endpoints
+- **API Documentation**: Well-documented API endpoints with Swagger/OpenAPI integration
 - **Logging**: Request logging with Morgan and Winston
 - **Testing**: Jest setup for unit and integration tests
 - **Docker Support**: Containerization with Docker and Docker Compose
@@ -28,6 +28,7 @@ A robust, production-ready Express.js server boilerplate with TypeScript, Prisma
 - Zod (Validation)
 - Redis (for caching and session management)
 - Socket.IO (for real-time communication)
+- Swagger/OpenAPI (for API documentation)
 - Jest (for testing)
 - Docker
 
@@ -183,6 +184,8 @@ docker-compose up -d
 
 ## API Documentation
 
+API documentation is available through Swagger UI at `/api-docs` when the server is running.
+
 ### Authentication Endpoints
 
 #### Register a new user
@@ -320,6 +323,28 @@ Stores detailed user information:
 - `firstName`: User's first name
 - `lastName`: User's last name
 - Additional profile fields
+
+## Caching Strategies
+
+The application implements several caching strategies using Redis:
+
+### Cache Patterns
+
+- **Data Caching**: Frequently accessed database queries are cached to reduce database load
+- **Response Caching**: Common API responses are cached to improve response times
+- **Session Caching**: User sessions are stored in Redis for stateless authentication
+
+### Cache Invalidation
+
+- **Time-based (TTL)**: Cache entries automatically expire after a configured time period
+- **Event-based**: Cache is invalidated when related data is modified
+- **Manual Purge**: Admin endpoints available for manually clearing specific cache entries
+
+### Implementation
+
+- Cache middleware for route-level caching
+- Service-level cache methods for fine-grained control
+- Configurable TTL values based on data type and access patterns
 
 ## Authentication System
 
