@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import config from 'config/app-config';
+import config from 'server/configs/app.config';
 import { AppLogger } from '../logger';
 
 const appLoggerPath = path.posix.join(process.cwd(), config.isDev ? 'logs/dev' : 'logs/prod');

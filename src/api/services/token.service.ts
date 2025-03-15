@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Unauthorized from 'responses/client-errors/unauthorized';
 import BadRequest from 'responses/client-errors/bad-request';
 import { TokenErrorMessage } from 'common/enums/token-error.enum';
-import appConfig from 'config/app-config';
+import appConfig from 'server/configs/app.config';
 
 // Token types
 export enum TokenType {

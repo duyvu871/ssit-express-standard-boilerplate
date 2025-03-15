@@ -5,13 +5,14 @@
 
 import express from 'express';
 import * as bodyParser from "body-parser";
-import config from "config/app-config";
+import config from "server/configs/app.config";
 import cors from 'cors';
 import cookieParser from "cookie-parser";
 import errorHandler from "responses/error-handler.ts";
 import route from 'server/api/routes';
 import routeNotFound from 'middlewares/route-not-found';
 import {morganMiddleware} from "logger/morgan";
+import { setupSwagger } from 'middlewares/swagger.middleware';
 
 import * as SocketIo from 'socket.io';
 import { Server, createServer } from 'http';
@@ -80,6 +81,9 @@ class ExpressServer {
         // Handle undefined routes (404)
         this._app.use('*', routeNotFound);
 
+        // Setup Swagger documentation
+        setupSwagger(this._app);
+        
         // Apply global error handling middleware
         this._app.use(errorHandler);
 

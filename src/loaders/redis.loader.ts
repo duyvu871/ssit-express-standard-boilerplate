@@ -4,7 +4,7 @@
  */
 
 import Redis from 'ioredis';
-import config from "config/app-config";
+import config from "server/configs/app.config";
 
 /**
  * @class RedisServer

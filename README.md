@@ -90,23 +90,138 @@ docker-compose up -d
 ## Project Structure
 
 ```
-/src
-  /@types              # TypeScript type definitions
-  /api                 # API endpoints and controllers
-    /controllers       # Request handlers
-    /middlewares       # Express middlewares
-    /models            # Data models
-    /routes            # API routes
-    /services          # Business logic
-    /validations       # Request validation schemas
-  /common              # Shared constants, enums, interfaces
-  /configs             # Application configuration
-  /loaders             # Application initialization modules
-  /repositories        # Data access layer
-  /responses           # Response handling
-  /shared              # Shared utilities
-/prisma                # Prisma schema and migrations
-/tests                 # Test files
+📦 project-root/
+├── 📜 .dockerignore
+├── 📜 .eslint.js
+├── 📜 .eslintignore
+├── 📜 .gitignore
+├── 📜 .prettierignore
+├── 📜 .prettierrc
+├── 📜 Dockerfile
+├── 📜 README.md
+├── 📜 docker-compose.yml
+├── 📜 jest.config.js
+├── 📜 package-lock.json
+├── 📜 package.json
+├── 📜 tsconfig.json
+├── 📜 tsup.config.ts
+│
+├── 📂 prisma/                      # Database schema and migrations
+│   └── 📜 schema.prisma
+│
+├── 📂 setup/                       # Project setup scripts
+│   └── 📜 setup-project.sh
+│
+├── 📂 src/                         # Source code directory
+│   ├── 📂 @types/                  # Global TypeScript type definitions
+│   │   ├── 📜 environment.d.ts
+│   │   └── 📜 global.d.ts
+│   │
+│   ├── 📂 api/                      # API-related logic
+│   │   ├── 📂 controllers/          # Request handlers
+│   │   │   ├── 📜 auth.controller.ts
+│   │   │   └── 📜 health.controller.ts
+│   │   ├── 📂 middlewares/          # Express middlewares
+│   │   │   ├── 📜 authenticate.ts
+│   │   │   ├── 📜 route-not-found.ts
+│   │   │   └── 📜 validate-request.ts
+│   │   ├── 📂 routes/               # Route definitions
+│   │   │   ├── 📜 auth.route.ts
+│   │   │   └── 📜 health.route.ts
+│   │   ├── 📂 services/             # Business logic
+│   │   │   ├── 📜 auth.service.ts
+│   │   │   ├── 📜 health.service.ts
+│   │   │   └── 📜 token.service.ts
+│   │   ├── 📂 validations/          # Validation schemas
+│   │   │   ├── 📜 auth.validation.ts
+│   │   │   └── 📜 token.validation.ts
+│   │   └── 📜 routes.ts
+│   │
+│   ├── 📂 common/                   # Shared constants, enums, and types
+│   │   ├── 📜 constants.ts
+│   │   ├── 📂 enums/
+│   │   │   ├── 📜 auth-error.enum.ts
+│   │   │   ├── 📜 http-error.ts
+│   │   │   └── 📜 token-error.enum.ts
+│   │   ├── 📂 interfaces/           # TypeScript interfaces
+│   │   │   ├── 📜 auth.ts
+│   │   │   ├── 📜 jsonwebtoken.ts
+│   │   │   └── 📜 responses.ts
+│   │   ├── 📜 types.ts
+│   │   ├── 📜 http-status-code.ts
+│   │
+│   ├── 📂 configs/                  # Configuration files
+│   │   ├── 📜 app-config.ts
+│   │   ├── 📜 path.ts
+│   │   └── 📂 __mocks__/            # Mock configurations for testing
+│   │       └── 📜 app-config.ts
+│   │
+│   ├── 📂 loaders/                  # Initialization scripts
+│   │   ├── 📜 cronjob.loader.ts
+│   │   ├── 📜 express.loader.ts
+│   │   ├── 📜 redis.loader.ts
+│   │   ├── 📜 websocket.loader.ts
+│   │   └── 📜 index.ts
+│   │
+│   ├── 📂 repositories/             # Database access layer
+│   │   ├── 📜 permission.repository.ts
+│   │   ├── 📜 prisma.ts
+│   │   ├── 📜 role.repository.ts
+│   │   ├── 📜 subscription.repository.ts
+│   │   └── 📜 user.repository.ts
+│   │
+│   ├── 📂 responses/                # Error handling and API responses
+│   │   ├── 📜 ErrorHandler.ts
+│   │   ├── 📂 client-errors/        # Client-side errors
+│   │   │   ├── 📜 bad-request.ts
+│   │   │   ├── 📜 conflict.ts
+│   │   │   ├── 📜 forbidden.ts
+│   │   │   ├── 📜 not-found.ts
+│   │   │   ├── 📜 unauthorized.ts
+│   │   │   └── 📜 unprocessable-entity.ts
+│   │   ├── 📂 server-errors/        # Server-side errors
+│   │   │   └── 📜 internal-server-error.ts
+│   │   ├── 📂 service-response/     # Service-level responses
+│   │   │   └── 📜 user.ts
+│   │   ├── 📂 success-response/     # Success response models
+│   │   │   └── 📜 success.ts
+│   │
+│   ├── 📂 shared/                   # Shared utilities
+│   │   ├── 📂 logger/
+│   │   │   ├── 📜 development.ts
+│   │   │   ├── 📜 index.ts
+│   │   │   ├── 📜 morgan.ts
+│   │   │   └── 📜 production.ts
+│   │   ├── 📂 utils/
+│   │   │   ├── 📜 async-handler.ts
+│   │   │   ├── 📜 cron.ts
+│   │   │   ├── 📜 csv.ts
+│   │   │   ├── 📜 date.ts
+│   │   │   ├── 📜 logger.ts
+│   │   │   ├── 📜 number.ts
+│   │   │   ├── 📜 object.ts
+│   │   │   ├── 📜 regex.ts
+│   │   │   ├── 📜 retry.ts
+│   │   │   ├── 📂 plugins/
+│   │   │   │   └── 📂 mongo/
+│   │   │   │       ├── 📜 index.ts
+│   │   │   │       └── 📜 toJSON.ts
+│   │   │   ├── 📂 service/
+│   │   │   │   └── 📜 plan.ts
+│   │   │   ├── 📜 sort.ts
+│   │   │   └── 📜 validator.ts
+│   │
+│   ├── 📜 server.ts                 # Application entry point
+│   │
+├── 📂 storage/                      # Static assets & temporary files
+│   ├── 📂 assets/
+│   │   ├── 📂 main/
+│   │   │   └── 📜 .gitkeep
+│   │   ├── 📂 temp/
+│   │   │   └── 📜 .gitkeep
+│   ├── 📂 statics/
+│   │   └── 📜 .gitkeep
+
 ```
 
 ### Key Files

@@ -8,9 +8,57 @@ const router = Router();
 const authController = new AuthController();
 
 /**
- * @route POST /auth/register
- * @desc Register a new user
- * @access Public
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - email
+ *               - password
+ *               - firstName
+ *               - lastName
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 tokens:
+ *                   type: object
+ *                   properties:
+ *                     access:
+ *                       type: string
+ *                     refresh:
+ *                       type: string
+ *       400:
+ *         description: Invalid input
+ *       409:
+ *         description: Username or email already exists
  */
 router.route('/register').post( 
     validateBody(authValidation.registerBody), 
@@ -18,9 +66,47 @@ router.route('/register').post(
 );
 
 /**
- * @route POST /auth/login
- * @desc Login a user
- * @access Public
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login a user
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 tokens:
+ *                   type: object
+ *                   properties:
+ *                     access:
+ *                       type: string
+ *                     refresh:
+ *                       type: string
+ *       401:
+ *         description: Invalid credentials
+ *       404:
+ *         description: User not found
  */
 router.route('/login').post(
     validateBody(authValidation.loginBody), 
@@ -28,9 +114,41 @@ router.route('/login').post(
 );
 
 /**
- * @route POST /auth/refresh-token
- * @desc Refresh access token
- * @access Public
+ * @swagger
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tokens:
+ *                   type: object
+ *                   properties:
+ *                     access:
+ *                       type: string
+ *                     refresh:
+ *                       type: string
+ *       401:
+ *         description: Invalid refresh token
+ *       404:
+ *         description: Refresh token not found
  */
 router.route('/refresh-token').post(
     validateBody(authValidation.refreshTokenBody),
@@ -48,9 +166,29 @@ router.route('/logout').post(
 );
 
 /**
- * @route GET /auth/profile
- * @desc Get user profile
- * @access Private
+ * @swagger
+ * /auth/profile:
+ *   get:
+ *     summary: Get user profile
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 profile:
+ *                   $ref: '#/components/schemas/UserProfile'
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *       404:
+ *         description: User profile not found
  */
 router.route('/profile').get(
     authenticate,
