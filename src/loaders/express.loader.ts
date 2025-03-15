@@ -8,7 +8,7 @@ import * as bodyParser from "body-parser";
 import config from "config/app-config";
 import cors from 'cors';
 import cookieParser from "cookie-parser";
-import errorHandler from "responses/ErrorHandler";
+import errorHandler from "responses/error-handler.ts";
 import route from 'server/api/routes';
 import routeNotFound from 'middlewares/route-not-found';
 import {morganMiddleware} from "logger/morgan";
