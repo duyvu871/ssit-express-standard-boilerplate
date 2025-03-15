@@ -134,13 +134,10 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-
-
-node_modules/
 dist/
-.env.local
-storage/
-storage/export/*.xlsx
+storage/assets/temp/*
+storage/assets/main/*
+storage/statics/*
 venv/
 build/
 playground/
