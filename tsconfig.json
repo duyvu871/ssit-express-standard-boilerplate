@@ -1,0 +1,90 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "composite": false,
+        "declaration": true,
+        "declarationMap": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowImportingTsExtensions": true,
+        "allowJs": true,
+        "noEmit": true,
+        "inlineSources": false,
+        "isolatedModules": true,
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "preserveWatchOutput": true,
+        "skipLibCheck": true,
+        "strict": false,
+        "strictNullChecks": true,
+        "resolveJsonModule": true,
+        "downlevelIteration": true,
+        "rootDir": "src",
+        "outDir": "dist",
+        "baseUrl": ".",
+        "paths": {
+            "server/*": [
+                "src/*"
+            ],
+            "types/*": [
+                "./src/@types/*"
+            ],
+            "enum": [
+                "./src/common/enums/*"
+            ],
+            "config/app-config": [
+                "./src/configs/app-config.ts"
+            ],
+            "common/*": [
+                "./src/common/*"
+            ],
+            "constants/*": [
+                "./src/common/constants/*"
+            ],
+            "responses/*": [
+                "./src/responses/*"
+            ],
+            "utils/*": [
+                "./src/utils/*"
+            ],
+            "middlewares/*": [
+                "./src/api/middlewares/*"
+            ],
+            "validations/*": [
+                "./src/api/validations/*"
+            ],
+            "loader/*": [
+                "./src/loaders/*"
+            ],
+            "routes/*": [
+                "./src/api/routes/*"
+            ],
+            "logger/*": [
+                "./src/shared/logger/*"
+            ],
+            "util/*": [
+                "./src/shared/utils/*"
+            ],
+            "services/*": [
+                "./src/api/services/*"
+            ],
+            "controllers/*": [
+                "./src/api/controllers/*"
+            ],
+            "models/*": [
+                "./src/api/models/*"
+            ],
+            "repository/*": [
+                "./src/repositories/*"
+            ],
+        },
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

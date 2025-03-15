@@ -1,0 +1,252 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// User model for storing user information
+model User {
+    id           Int      @id @default(autoincrement())
+    username     String   @unique @db.VarChar(50)
+    email        String   @unique @db.VarChar(100)
+    passwordHash String   @map("password_hash") @db.VarChar(255)
+    isActive     Boolean  @default(true) @map("is_active")
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    userRoles     UserRole[] // Relation to UserRole model
+    refreshTokens RefreshToken[] // Relation to RefreshToken model
+    loginLogs     LoginLog[] // Relation to LoginLog model
+    subscriptions Subscription[] // Relation to Subscription model
+    userProfile   UserProfile? // Relation to UserProfile model
+    activityLogs  ActivityLog[] // Relation to ActivityLog model
+    notifications Notification[] // Relation to Notification model
+    payments      Payment[] // Relation to Payment model
+    feedbacks     Feedback[] // Relation to Feedback model
+
+    @@map("users")
+}
+
+// Role model for storing different roles in the system
+model Role {
+    id   Int    @id @default(autoincrement())
+    name String @unique @db.VarChar(50)
+
+    // Relations
+    userRoles       UserRole[] // Relation to UserRole model
+    rolePermissions RolePermission[] // Relation to RolePermission model
+
+    @@map("roles")
+}
+
+// Permission model for storing different permissions
+model Permission {
+    id   Int    @id @default(autoincrement())
+    name String @unique @db.VarChar(50)
+
+    // Relations
+    rolePermissions RolePermission[] // Relation to RolePermission model
+
+    @@map("permissions")
+}
+
+// UserRole model for many-to-many relation between User and Role
+model UserRole {
+    userId Int @map("user_id")
+    roleId Int @map("role_id")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+    @@id([userId, roleId])
+    @@map("user_roles")
+}
+
+// RolePermission model for many-to-many relation between Role and Permission
+model RolePermission {
+    roleId       Int @map("role_id")
+    permissionId Int @map("permission_id")
+
+    // Relations
+    role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+    @@id([roleId, permissionId])
+    @@map("role_permissions")
+}
+
+// RefreshToken model for storing JWT refresh tokens
+model RefreshToken {
+    id        Int      @id @default(autoincrement())
+    userId    Int      @map("user_id")
+    token     String   @db.VarChar(255)
+    expiresAt DateTime @map("expires_at")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("refresh_tokens")
+}
+
+// LoginLog model for tracking user login history
+model LoginLog {
+    id        Int      @id @default(autoincrement())
+    userId    Int      @map("user_id")
+    loginAt   DateTime @default(now()) @map("login_at")
+    ipAddress String?  @map("ip_address") @db.VarChar(50)
+    userAgent String?  @map("user_agent") @db.Text
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("login_logs")
+}
+
+// PublicKey model for storing RSA public keys for JWT signing
+model PublicKey {
+    id        Int      @id @default(autoincrement())
+    key       String   @db.Text
+    createdAt DateTime @default(now()) @map("created_at")
+
+    @@map("public_keys")
+}
+
+// Subscription model for tracking user subscriptions
+model Subscription {
+    id               Int       @id @default(autoincrement())
+    userId           Int       @map("user_id")
+    type             String    @db.VarChar(50) // e.g., "basic", "premium", "enterprise"
+    status           String    @db.VarChar(20) // e.g., "active", "expired", "cancelled"
+    startDate        DateTime  @map("start_date")
+    endDate          DateTime  @map("end_date")
+    autoRenew        Boolean   @default(false) @map("auto_renew")
+    paymentMethod    String?   @map("payment_method") @db.VarChar(50)
+    paymentReference String?   @map("payment_reference") @db.VarChar(100)
+    lastBillingDate  DateTime? @map("last_billing_date")
+    nextBillingDate  DateTime? @map("next_billing_date")
+    createdAt        DateTime  @default(now()) @map("created_at")
+    updatedAt        DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("subscriptions")
+}
+
+// UserProfile model for storing detailed user profile information
+model UserProfile {
+    id              Int       @id @default(autoincrement())
+    userId          Int       @unique @map("user_id")
+    firstName       String?   @map("first_name") @db.VarChar(50)
+    lastName        String?   @map("last_name") @db.VarChar(50)
+    phoneNumber     String?   @map("phone_number") @db.VarChar(20)
+    dateOfBirth     DateTime? @map("date_of_birth")
+    gender          String?   @db.VarChar(20)
+    address         String?   @db.VarChar(255)
+    city            String?   @db.VarChar(100)
+    state           String?   @db.VarChar(100)
+    country         String?   @db.VarChar(100)
+    postalCode      String?   @map("postal_code") @db.VarChar(20)
+    profilePicture  String?   @map("profile_picture") @db.VarChar(255)
+    bio             String?   @db.Text
+    socialMediaUrls Json?     @map("social_media_urls")
+    preferences     Json?     // User preferences as JSON
+    createdAt       DateTime  @default(now()) @map("created_at")
+    updatedAt       DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("user_profiles")
+}
+
+// ActivityLog model for tracking user activities
+model ActivityLog {
+    id          Int      @id @default(autoincrement())
+    userId      Int      @map("user_id")
+    activityType String   @map("activity_type") @db.VarChar(100) // e.g., "page_view", "button_click", "form_submit"
+    description String?  @db.Text
+    ipAddress   String?  @map("ip_address") @db.VarChar(50)
+    userAgent   String?  @map("user_agent") @db.Text
+    metadata    Json?    // Additional activity data as JSON
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("activity_logs")
+}
+
+// Notification model for storing user notifications
+model Notification {
+    id           Int       @id @default(autoincrement())
+    userId       Int       @map("user_id")
+    type         String    @db.VarChar(50) // e.g., "system", "alert", "message"
+    title        String    @db.VarChar(255)
+    content      String    @db.Text
+    isRead       Boolean   @default(false) @map("is_read")
+    readAt       DateTime? @map("read_at")
+    metadata     Json?     // Additional notification data as JSON
+    createdAt    DateTime  @default(now()) @map("created_at")
+    expiresAt    DateTime? @map("expires_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("notifications")
+}
+
+// Payment model for tracking payment transactions
+model Payment {
+    id                Int      @id @default(autoincrement())
+    userId            Int      @map("user_id")
+    amount            Decimal  @db.Decimal(10, 2)
+    currency          String   @db.VarChar(3) // e.g., "USD", "EUR", "VND"
+    status            String   @db.VarChar(20) // e.g., "pending", "completed", "failed", "refunded"
+    paymentMethod     String   @map("payment_method") @db.VarChar(50) // e.g., "credit_card", "paypal", "bank_transfer"
+    paymentProvider   String?  @map("payment_provider") @db.VarChar(50) // e.g., "stripe", "paypal"
+    transactionId     String?  @map("transaction_id") @db.VarChar(100)
+    invoiceNumber     String?  @map("invoice_number") @db.VarChar(50)
+    description       String?  @db.Text
+    billingAddress    Json?    @map("billing_address") // Billing address as JSON
+    metadata          Json?    // Additional payment data as JSON
+    createdAt         DateTime @default(now()) @map("created_at")
+    updatedAt         DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("payments")
+}
+
+// Feedback model for storing user feedback and reviews
+model Feedback {
+    id           Int       @id @default(autoincrement())
+    userId       Int       @map("user_id")
+    title        String?   @db.VarChar(255)
+    content      String    @db.Text
+    rating       Int?      @db.SmallInt // Rating score (e.g., 1-5)
+    category     String?   @db.VarChar(50) // e.g., "product", "service", "website", "app"
+    status       String    @default("pending") @db.VarChar(20) // e.g., "pending", "reviewed", "resolved"
+    isPublic     Boolean   @default(false) @map("is_public")
+    adminReply   String?   @map("admin_reply") @db.Text
+    repliedAt    DateTime? @map("replied_at")
+    repliedBy    String?   @map("replied_by") @db.VarChar(100)
+    metadata     Json?     // Additional feedback data as JSON
+    createdAt    DateTime  @default(now()) @map("created_at")
+    updatedAt    DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("feedbacks")
+}
