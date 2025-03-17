@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodError, ZodType, ZodObject, ZodEffects } from 'zod';
 import { HttpStatusCode } from 'common/http-status-code';
 import BadRequest from 'responses/client-errors/bad-request';
-import appLogger from 'util/logger';
+import logger from 'util/logger';
 import InternalServerError from 'responses/server-errors/internal-server-error';
 
 type ValidateType = 'body' | 'headers' | 'query' | 'params';
@@ -44,12 +44,12 @@ const validate = (type: ValidateType, ...schemas: ZodType<any>[]) => {
 			next();
 		} catch (error) {
 			if (error instanceof BadRequest) {
-				appLogger.warn(`Validation error [${type}]: ${error.message}`);
+				logger.warn(`Validation error [${type}]: ${error.message}`);
 				return next(error);
 			}
 
 			if (error instanceof ZodError) {
-                appLogger.warn(`Zod validation error [${type}]: ${error.errors.map((err) =>
+                logger.warn(`Zod validation error [${type}]: ${error.errors.map((err) =>
 					`${err.path.join('.')} (${type}): ${err.message}`
 				).join(', ')}`);
 				const errorMessages = error.errors.map((err) => err.message);
@@ -60,11 +60,11 @@ const validate = (type: ValidateType, ...schemas: ZodType<any>[]) => {
 					errorMessages.join(', ')
 				);
 
-				appLogger.warn(`Zod validation error [${type}]: ${validationError.message}`);
+				logger.warn(`Zod validation error [${type}]: ${validationError.message}`);
 				return next(validationError);
 			}
 
-			appLogger.error('Unexpected validation error:', error);
+			logger.error('Unexpected validation error:', error);
 			next(new InternalServerError(
 				'INTERNAL_VALIDATION_ERROR',
 				'Validation processing failed',

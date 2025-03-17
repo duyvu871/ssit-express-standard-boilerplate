@@ -1,13 +1,13 @@
 import * as dotenv from "dotenv";
-import { resolve } from "path";
+import { resolve, join } from "path";
 import * as process from "process";
 
 // Skip .env file loading in test environment
 if (process.env.NODE_ENV !== 'test') {
-    const ENV_FILE_PATH = resolve(process.env.NODE_ENV === "production" ? ".env" : ".env.local");
+    const ENV_FILE_PATH = join(process.cwd(), process.env.NODE_ENV === "production" ? ".env" : ".env.local");
     const isEnvFound = dotenv.config({ path: ENV_FILE_PATH });
     if (isEnvFound.error) {
-        throw new Error("Cannot find .env file.");
+        throw new Error(`Cannot find ${process.env.NODE_ENV === "production" ? ".env" : ".env.local"} file.`);
     }
 }
 

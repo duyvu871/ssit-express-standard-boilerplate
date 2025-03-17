@@ -10,6 +10,7 @@ import { Server } from 'http';
 import { SocketEvent } from 'common/constants';
 // import LiveBitcoinWebsocket from "../websockets/LiveBitcoinWebsocket";
 import RedisServer from "loader/redis.loader";
+import { NotificationWebSocket } from 'websockets/notification.socket';
 
 /**
  * @class SocketServer
@@ -63,6 +64,7 @@ class SocketServer {
         });
         this._redis = redis;
         this.listen();
+        new NotificationWebSocket(this, redis);
         // new LiveBitcoinWebsocket(this, this._redis).initialize();
     }
 

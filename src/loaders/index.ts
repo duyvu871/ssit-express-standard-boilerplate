@@ -6,6 +6,9 @@
 import ExpressServer from 'loader/express.loader';
 import RedisServer from 'loader/redis.loader';
 import SocketServer from 'loader/websocket.loader';
+import DatabaseSeeder from 'loader/database-seeder.loader';
+import logger from 'server/shared/utils/logger';
+
 
 /**
  * @function
@@ -19,6 +22,15 @@ import SocketServer from 'loader/websocket.loader';
  *  - Registering event listeners for process exit signals to ensure graceful shutdown.
  */
 export default async () => {
+    // Initialize database with essential data
+    try {
+        const databaseSeeder = new DatabaseSeeder();
+        await databaseSeeder.initialize();
+        logger.info('Database seeding completed successfully');
+    } catch (error) {
+        logger.error('Error during database seeding:', error);
+    }
+
     // start express
     const expressServer = new ExpressServer();
     const expressInstance = expressServer.server;

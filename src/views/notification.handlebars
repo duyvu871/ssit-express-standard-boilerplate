@@ -1,0 +1,26 @@
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">Notifications</h1>
+
+    <div class="space-y-4">
+        {{#each notifications}}
+        <div class="bg-white p-4 rounded-lg shadow" x-data="{ isRead: {{isRead}} }" :class="{ 'bg-blue-50': !isRead }">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-lg">{{title}}</h3>
+                    <p class="text-gray-600 mt-1">{{content}}</p>
+                    <span class="text-sm text-gray-500">{{createdAt}}</span>
+                </div>
+                <button x-show="!isRead"
+                    @click="isRead = true; fetch('/api/notifications/{{id}}/read', { method: 'POST' })"
+                    class="text-blue-600 hover:text-blue-800">
+                    Mark as read
+                </button>
+            </div>
+        </div>
+        {{else}}
+        <div class="text-center py-8 text-gray-500">
+            No notifications yet
+        </div>
+        {{/each}}
+    </div>
+</div>

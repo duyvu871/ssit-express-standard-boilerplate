@@ -64,11 +64,17 @@
             "routes/*": [
                 "./src/api/routes/*"
             ],
+            "websockets/*": [
+                "./src/api/websockets/*"
+            ],
             "logger/*": [
                 "./src/shared/logger/*"
             ],
             "util/*": [
                 "./src/shared/utils/*"
+            ],
+            "shared/*": [
+                "./src/shared/*"
             ],
             "services/*": [
                 "./src/api/services/*"

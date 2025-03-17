@@ -1,3 +1,7 @@
 import loaders from "./loaders";
 
-export default loaders();
+// const server = loaders();
+// export default server;
+// export { server };
+
+loaders();

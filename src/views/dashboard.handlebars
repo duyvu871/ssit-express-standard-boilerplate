@@ -1,0 +1,147 @@
+<div class="min-h-screen" x-data="{
+    user: null,
+    loading: true,
+    error: '',
+    async logout() {
+        try {
+            // Get the refresh token from localStorage
+            const refreshToken = localStorage.getItem('refreshToken');
+            
+            // Call the logout API
+            const response = await fetch('/api/v1/auth/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Logout failed');
+            }
+            
+            // Clear tokens from localStorage
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            
+            // Redirect to login page
+            window.location.href = '/';
+        } catch (err) {
+            this.error = err.message;
+        }
+    },
+    async fetchUserProfile() {
+        this.loading = true;
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                window.location.href = '/';
+                return;
+            }
+            
+            const response = await fetch('/api/v1/auth/profile', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    // Token expired, redirect to login
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                    window.location.href = '/';
+                    return;
+                }
+                throw new Error('Failed to fetch user profile');
+            }
+            
+            const data = await response.json();
+            this.user = data.data;
+        } catch (err) {
+            this.error = err.message;
+        } finally {
+            this.loading = false;
+        }
+    }
+}" x-init="fetchUserProfile()">
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-4xl mx-auto">
+        <!-- Header with logout button -->
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+            <h1 class="text-2xl font-bold text-gray-800">User Dashboard</h1>
+            <button 
+                @click="logout()"
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Logout
+            </button>
+        </div>
+        
+        <!-- Loading state -->
+        <div x-show="loading" class="text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
+            <p class="mt-2 text-gray-600">Loading user information...</p>
+        </div>
+        
+        <!-- Error message -->
+        <div x-show="error && !loading" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <span x-text="error"></span>
+        </div>
+        
+        <!-- User information -->
+        <div x-show="user && !loading" class="space-y-6">
+            <!-- Profile section -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Profile Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Username</p>
+                        <p class="font-medium" x-text="user.username"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Email</p>
+                        <p class="font-medium" x-text="user.email"></p>
+                    </div>
+                    <div x-show="user.userProfile">
+                        <p class="text-sm text-gray-500">First Name</p>
+                        <p class="font-medium" x-text="user.userProfile?.firstName || 'Not provided'"></p>
+                    </div>
+                    <div x-show="user.userProfile">
+                        <p class="text-sm text-gray-500">Last Name</p>
+                        <p class="font-medium" x-text="user.userProfile?.lastName || 'Not provided'"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account details -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Account Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Account Status</p>
+                        <p class="font-medium">
+                            <span 
+                                x-text="user.isActive ? 'Active' : 'Inactive'"
+                                :class="user.isActive ? 'text-green-600' : 'text-red-600'"
+                            ></span>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Member Since</p>
+                        <p class="font-medium" x-text="new Date(user.createdAt).toLocaleDateString()"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User roles -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Roles & Permissions</h2>
+                <div class="flex flex-wrap gap-2" x-show="user.userRoles && user.userRoles.length > 0">
+                    <template x-for="userRole in user.userRoles" :key="userRole.id">
+                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full" x-text="userRole.role.name"></span>
+                    </template>
+                </div>
+                <p x-show="!user.userRoles || user.userRoles.length === 0" class="text-gray-500">No roles assigned</p>
+            </div>
+        </div>
+    </div>
+</div>

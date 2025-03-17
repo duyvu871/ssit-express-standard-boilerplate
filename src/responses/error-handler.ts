@@ -4,6 +4,7 @@ import NotFound from 'responses/client-errors/not-found';
 import UnprocessableEntity from 'responses/client-errors/unprocessable-entity';
 import InternalServerError from 'server/responses/server-errors/internal-server-error';
 import Forbidden from 'responses/client-errors/forbidden';
+import Conflict from 'responses/client-errors/conflict';
 
 import { ICustomErrorResponse } from "common/interfaces/responses";
 import { Request, Response, NextFunction } from "express";
@@ -13,7 +14,7 @@ export default (err: Error | ICustomErrorResponse, req: Request, res: Response, 
         return next();
     }
 
-    console.log('name', err.constructor.name);
+    // console.log('name', err.constructor.name);
 
     if (
         err instanceof Unauthorized ||
@@ -22,7 +23,8 @@ export default (err: Error | ICustomErrorResponse, req: Request, res: Response, 
         err instanceof Unauthorized ||
         err instanceof UnprocessableEntity ||
         err instanceof InternalServerError ||
-        err instanceof Forbidden
+        err instanceof Forbidden ||
+        err instanceof Conflict
     ) {
         return reportCustomError(err, res);
     }

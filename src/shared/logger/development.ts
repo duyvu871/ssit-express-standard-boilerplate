@@ -1,5 +1,6 @@
 import { createLogger, format, transports, Logger } from "winston";
 import "winston-daily-rotate-file";
+import path from 'path';
 
 export class DevelopmentLogger {
 	private static instance: Logger;
@@ -17,16 +18,17 @@ export class DevelopmentLogger {
 	// Create a logger with specific configurations
 	private static createLogger(): Logger {
 		const logFormat = format.printf(
-			({ level, message, timestamp, stack }) =>
-				`${timestamp} [${level.toUpperCase()}]: ${stack || message}`
+			({ level, message, timestamp, stack, meta }) =>
+				`${timestamp} [${level.toUpperCase()}]: ${stack || message} ${meta ? JSON.stringify(meta) : ''}`
 		);
 
 		return createLogger({
-			level: "info",
+			level: "debug", // Set level to debug to capture all log levels
 			format: format.combine(
 				format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
 				format.errors({ stack: true }),
 				format.splat(),
+				format.metadata(), // Add metadata to the log info
 				format.json(),
 				format.colorize(),
 				logFormat
@@ -37,7 +39,8 @@ export class DevelopmentLogger {
 
 				// Log to file for all levels
 				new transports.DailyRotateFile({
-					filename: "logs/application-%DATE%.log",
+					level: "info",
+					filename: path.join("logs", "dev", "app", "application-%DATE%.log"),
 					datePattern: "YYYY-MM-DD",
 					maxSize: "20m",
 					maxFiles: "14d",
@@ -46,21 +49,32 @@ export class DevelopmentLogger {
 				// Log errors (level: error) to a separate file
 				new transports.DailyRotateFile({
 					level: "error",
-					filename: "logs/error-%DATE%.log",
+					filename: path.join("logs", "dev", "error-%DATE%.log"),
 					datePattern: "YYYY-MM-DD",
 					maxSize: "20m",
 					maxFiles: "30d",
 				}),
 
+				// HTTP logs
 				new transports.DailyRotateFile({
-					filename: "logs/http-%DATE%.log",
-					// ... các config khác giữ nguyên
+					filename: path.join("logs", "dev", "http", "http-%DATE%.log"),
+					level: 'http',
 					format: format.combine(
 						format((info) => info.context === 'HTTP' ? info : false)(),
 						format.printf(({ timestamp, level, message, meta }) => {
-							return `${timestamp} [${level}] ${message} ${JSON.stringify(meta)}`;
+							return `${timestamp} [${level}] ${message} ${meta ? JSON.stringify(meta) : ''}`;
 						})
 					)
+				}),
+
+				// Debug logs - add proper debug transport
+				new transports.DailyRotateFile({
+					level: "debug",
+					filename: path.join("logs", "dev", "debug-%DATE%.log"),
+					datePattern: "YYYY-MM-DD",
+					maxSize: "20m",
+					maxFiles: "7d",
+					zippedArchive: true,
 				})
 			],
 			exitOnError: false, // Do not exit the program on error

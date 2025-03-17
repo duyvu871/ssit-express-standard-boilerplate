@@ -1,14 +1,20 @@
-version: '3.7'
+
+version: '3.8'
+
 services:
     postgres:
         image: postgres:14-alpine
         restart: unless-stopped
-        ports:
-            - '5432:5432'
+        env_file:
+            - .env
+        # ports:
+        #     - '${DB_POSTGRES_PORT}:${DB_POSTGRES_PORT}'
         environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
-            - POSTGRES_DB=postgres
+            TZ: Asia/Ho_Chi_Minh
+            POSTGRES_USER: ${DB_POSTGRES_USER}
+            POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD}
+            POSTGRES_DB: ${DB_POSTGRES_DATABASE}
+            POSTGRES_HOST_AUTH_METHOD: trust
         volumes:
             - postgres_data:/var/lib/postgresql/data
         healthcheck:
@@ -20,8 +26,6 @@ services:
     redis:
         image: 'redis:alpine'
         restart: unless-stopped
-        ports:
-            - '6379:6379'
         volumes:
             - redis_data:/data
         healthcheck:
@@ -36,10 +40,12 @@ services:
             dockerfile: Dockerfile
         restart: unless-stopped
         ports:
-            - '8000:8000'
+            - '${SERVER_PORT}:${SERVER_PORT}'
         depends_on:
-            - postgres
-            - redis
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
         env_file:
             - .env
         volumes:
@@ -48,5 +54,6 @@ services:
 volumes:
     postgres_data:
     redis_data:
-        # To rebuild a specific service:
-        # docker-compose up -d --no-deps --build --no-cache <service_name>
+
+# To rebuild a specific service:
+# docker-compose up -d --no-deps --build --no-cache <service_name>

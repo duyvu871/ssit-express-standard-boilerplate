@@ -59,9 +59,10 @@ export class AuthController {
 
     getProfile = AsyncMiddleware.asyncHandler(
         async (req: Request, res: Response) => {
+            // @ts-ignore - userId is added by auth middleware
             const userId = req.userId;
-            if (userId === undefined) {
-                throw new Error('User ID is required');
+            if (!userId) {
+                throw new Error('User not found');
             }
             const user = await this.authService.getUserProfile(userId);
             const response = new Success(user).toJson;
@@ -71,10 +72,11 @@ export class AuthController {
 
     changePassword = AsyncMiddleware.asyncHandler(
         async (req: Request<{}, any, ChangePasswordBody>, res: Response) => {
+            // @ts-ignore - userId is added by auth middleware
             const userId = req.userId;
             const { currentPassword, newPassword } = req.body;
-            if (userId === undefined) {
-                throw new Error('User ID is required');
+            if (!userId) {
+                throw new Error('User not found');
             }
             await this.authService.changePassword(userId, currentPassword, newPassword);
             const response = new Success(null).toJson;

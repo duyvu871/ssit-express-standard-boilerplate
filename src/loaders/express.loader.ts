@@ -17,6 +17,8 @@ import { setupSwagger } from 'middlewares/swagger.middleware';
 import * as SocketIo from 'socket.io';
 import { Server, createServer } from 'http';
 import RedisServer from "loader/redis.loader";
+import { engine } from 'express-handlebars';
+import path from 'path/posix';
 
 
 /**
@@ -62,6 +64,13 @@ class ExpressServer {
 
         // Apply Morgan middleware for logging HTTP requests
         this._app.use(morganMiddleware);
+        this._app.engine('handlebars', engine({
+            defaultLayout: 'main',
+            layoutsDir: path.join(process.cwd(), 'src/views/layouts'),
+            partialsDir: path.join(process.cwd(), 'src/views/partials'),
+        }));
+        this._app.set('view engine', 'handlebars');
+        this._app.set('views', path.join(process.cwd(), 'src/views'));
 
         // Serve static files from the 'statics' directory
         this._app.use('/statics', express.static('statics'));

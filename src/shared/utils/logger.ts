@@ -1,14 +1,14 @@
 import * as path from 'node:path';
 import config from 'server/configs/app.config';
-import { AppLogger } from '../logger';
+import { AppLogger } from 'shared/logger';
 
 const appLoggerPath = path.posix.join(process.cwd(), config.isDev ? 'logs/dev' : 'logs/prod');
 
-const logger = new AppLogger(appLoggerPath);
-const appLogger = logger.createLogger('app');
+const appLogger = new AppLogger(appLoggerPath);
+const logger = appLogger.createLogger('app');
 
 export {
-	appLogger
+	logger
 };
 
-export default appLogger;
+export default logger;

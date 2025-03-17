@@ -1,6 +1,7 @@
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import { IDecodedToken } from 'common/interfaces/jsonwebtoken';
 import prisma from 'repository/prisma';
+import crypto from "crypto"
 import { v4 as uuidv4 } from 'uuid';
 import Unauthorized from 'responses/client-errors/unauthorized';
 import BadRequest from 'responses/client-errors/bad-request';
@@ -86,9 +87,7 @@ export default class TokenService {
         };
 
         // Generate access token
-        const accessToken = jwt.sign(tokenData, this.accessTokenSecret, {
-            expiresIn: this.accessTokenExpiry,
-        });
+        const accessToken = jwt.sign(tokenData, this.accessTokenSecret);
 
         // Create refresh token data
         const refreshTokenData = {
@@ -97,9 +96,7 @@ export default class TokenService {
         };
 
         // Generate refresh token
-        const refreshToken = jwt.sign(refreshTokenData, this.refreshTokenSecret, {
-            expiresIn: this.refreshTokenExpiry,
-        });
+        const refreshToken = jwt.sign(refreshTokenData, this.refreshTokenSecret);
 
         // Store refresh token in database
         await this.saveRefreshToken(userId, refreshToken, refreshTokenData.exp);
@@ -157,10 +154,13 @@ export default class TokenService {
                 );
             }
             
-            // Check if token exists in database
+            // Create a hash of the token to match what's stored in the database
+            const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+            
+            // Check if token exists in database using the hash
             const storedToken = await prisma.refreshToken.findFirst({
                 where: {
-                    token,
+                    token: tokenHash,
                     userId: decoded.payload.userId
                 }
             });
@@ -257,11 +257,14 @@ export default class TokenService {
         }
 
         try {
+            // Create a hash of the token to match what's stored in the database
+            const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+            
             // If userId is provided, use it directly
             if (userId) {
                 await prisma.refreshToken.deleteMany({
                     where: {
-                        token: refreshToken,
+                        token: tokenHash,
                         userId: userId
                     }
                 });
@@ -272,7 +275,7 @@ export default class TokenService {
                 // Delete the token from database
                 await prisma.refreshToken.deleteMany({
                     where: {
-                        token: refreshToken,
+                        token: tokenHash,
                         // @ts-ignore decoded.payload.userId is number
                         userId: decoded.payload.userId
                     }
@@ -333,18 +336,22 @@ export default class TokenService {
      * @private
      */
     private async saveRefreshToken(userId: number, token: string, expiresAt: number): Promise<void> {
-        // Delete any existing tokens with the same token value (shouldn't happen, but just in case)
+        // Create a hash of the token to store in the database
+        // This ensures the token value fits within the VARCHAR(255) column
+        const tokenHash = require('crypto').createHash('sha256').update(token).digest('hex');
+        
+        // Delete any existing tokens with the same token hash (shouldn't happen, but just in case)
         await prisma.refreshToken.deleteMany({
             where: {
-                token
+                token: tokenHash
             }
         });
 
-        // Create new refresh token record
+        // Create new refresh token record with the hash
         await prisma.refreshToken.create({
             data: {
                 userId,
-                token,
+                token: tokenHash,
                 expiresAt: new Date(expiresAt)
             }
         });

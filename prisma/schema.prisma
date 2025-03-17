@@ -87,7 +87,7 @@ model RolePermission {
 model RefreshToken {
     id        Int      @id @default(autoincrement())
     userId    Int      @map("user_id")
-    token     String   @db.VarChar(255)
+    token     String   @db.Text
     expiresAt DateTime @map("expires_at")
     createdAt DateTime @default(now()) @map("created_at")
 

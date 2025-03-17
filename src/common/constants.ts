@@ -4,7 +4,10 @@ export enum SocketEvent {
     MESSAGE = 'message',
     SCAN_VOUCHER_SUCCESS = 'scan_voucher_success',
     INBOX_NOTIFICATION = 'inbox_notification',
-    INBOX_ANNOUNCEMENT = 'inbox_announcement'
+    INBOX_ANNOUNCEMENT = 'inbox_announcement',
+    JOIN_USER_ROOM = "join_user_room",
+    MARK_READ = "mark_read",
+    NOTIFICATION = "notification",
 };
 
 export enum SocketStatus {
