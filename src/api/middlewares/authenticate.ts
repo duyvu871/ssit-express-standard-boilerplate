@@ -104,6 +104,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
             });
             next(new Unauthorized('TOKEN_EXPIRED', TokenErrorMessage.TOKEN_EXPIRED, TokenErrorMessage.TOKEN_EXPIRED));
         } else {
+            
             logger.error('Authentication failed', { 
                 error: error instanceof Error ? error.message : 'Unknown error',
                 path: req.originalUrl
