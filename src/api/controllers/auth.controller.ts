@@ -35,6 +35,8 @@ export class AuthController {
             const { username, password } = req.body;
             const result = await this.authService.login(username, password);
             const response = new Success(result).toJson;
+            console.log("login success", response);
+            
             return res.status(200).json(response);
         }
     );

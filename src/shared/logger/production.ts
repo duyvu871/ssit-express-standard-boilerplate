@@ -76,15 +76,7 @@ export class AppLogger {
 			
 			logMessage += `: ${stack || message}`;
 			
-			// // Add metadata if present and not empty
-			// const metaKeys = Object.keys(meta).filter(key => !['timestamp', 'level', 'message', 'stack'].includes(key));
-			// if (metaKeys.length > 0) {
-			// 	const metaData = {};
-			// 	metaKeys.forEach(key => {
-			// 		metaData[key] = meta[key];
-			// 	});
-			// 	logMessage += ` ${JSON.stringify(metaData)}`;
-			// }
+			logMessage += ` ${JSON.stringify(meta)}`;
 			
 			return logMessage;
 		});
@@ -98,7 +90,7 @@ export class AppLogger {
 				timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
 				errors({ stack: true }), // Log stack trace for errors
 				commonMetadata(), // Add common metadata
-				splat(), // Add splat for printf
+				// splat(), // Add splat for printf
 				// Using printf format instead of JSON for plain text output
 				// printf(({ level, message, timestamp, stack, service, context, ...meta }) => {
 				// 	let logMessage = `${timestamp} ${level.toUpperCase()}`;
@@ -179,10 +171,10 @@ export class AppLogger {
 							
 							logMessage += `: ${stack || message}`;
 							
-							// Add HTTP metadata if present
-							if (meta.http) {
-								logMessage += ` ${JSON.stringify(meta.http)}`;
-							}
+							// // Add HTTP metadata if present
+							// if (meta.http) {
+							// 	logMessage += ` ${JSON.stringify(meta.http)}`;
+							// }
 							
 							return logMessage;
 						})

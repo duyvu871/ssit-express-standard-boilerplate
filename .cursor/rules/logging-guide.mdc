@@ -1,0 +1,188 @@
+---
+description: This project uses a robust logging system built on Winston and Morgan for comprehensive application logging. The system follows best practices for structured logging, context separation, and log management.
+globs: 
+alwaysApply: false
+---
+# Logging System Guide
+
+## Overview
+
+This project uses a robust logging system built on Winston and Morgan for comprehensive application logging. The system follows best practices for structured logging, context separation, and log management.
+
+## Key Features
+
+- **Structured Logging**: All logs include metadata like service name, hostname, and environment
+- **Custom Log Levels**: Extended log levels including `alert` for important notifications
+- **Context Separation**: Logs can be organized by context (HTTP, Database, Auth, etc.)
+- **Multiple Transports**: Console, file rotation with compression, and specialized error logs
+- **HTTP Request Logging**: Integrated Morgan middleware for detailed HTTP request logging
+
+## Log Levels
+
+The system uses the following log levels (in order of priority):
+
+1. `error` - Critical errors that require immediate attention
+2. `warn` - Warning conditions that should be addressed
+3. `alert` - Important notifications that need attention but aren't errors
+4. `info` - General informational messages about system operation
+5. `http` - HTTP request/response logging
+6. `debug` - Detailed debugging information (development only)
+7. `silly` - Extremely detailed debugging (rarely used)
+
+## Basic Usage
+
+```typescript
+import logger from 'shared/utils/logger';
+
+// Simple logging
+logger.info('User registered successfully');
+logger.error('Database connection failed');
+
+// Logging with metadata
+logger.info('Payment processed', { 
+  userId: 123, 
+  amount: 99.99, 
+  currency: 'USD' 
+});
+
+// Using the alert level for important notifications
+logger.alert('System backup completed', { backupSize: '2.3GB' });
+
+// Logging errors with stack traces
+try {
+  // Some operation that might fail
+} catch (error) {
+  logger.error('Operation failed', error);
+}
+```
+
+## Context-Based Logging
+
+For more organized logs, you can create context-specific loggers:
+
+```typescript
+// Create a logger for database operations
+const dbLogger = logger.childContext('DATABASE');
+
+dbLogger.info('Connected to database');
+dbLogger.error('Query failed', { query: 'SELECT * FROM users', error: 'Timeout' });
+
+// Create a logger for authentication
+const authLogger = logger.childContext('AUTH');
+
+authLogger.info('User authenticated', { userId: 123 });
+authLogger.warn('Failed login attempt', { username: 'user@example.com', ip: '192.168.1.1' });
+```
+
+## HTTP Request Logging
+
+HTTP requests are automatically logged by the Morgan middleware. The logs include:
+
+- Request method and URL
+- Response status code
+- Response time
+- Content length
+- User agent
+- IP address
+- Referrer
+- Request ID (if available)
+
+The log level is automatically determined based on the status code:
+- 5xx responses: `error` level
+- 4xx responses: `warn` level
+- All others: `http` level
+
+## Log Files
+
+Logs are stored in the following locations:
+
+- **Development**: `logs/dev/`
+- **Production**: `logs/prod/`
+
+Within these directories, logs are organized by type:
+
+- `application-YYYY-MM-DD.log` - General application logs (info level and above)
+- `error-YYYY-MM-DD.log` - Error logs only
+- `http-YYYY-MM-DD.log` - HTTP request logs
+- `debug-YYYY-MM-DD.log` - Debug logs (development only)
+
+Logs are automatically rotated daily and compressed after reaching 20MB.
+
+## Best Practices
+
+1. **Use Appropriate Log Levels**: Choose the right log level based on the importance of the message.
+
+2. **Include Contextual Data**: Always include relevant metadata with your logs to make troubleshooting easier.
+
+3. **Don't Log Sensitive Information**: Never log passwords, tokens, or personal information.
+
+4. **Use Structured Logging**: Prefer structured metadata over string concatenation.
+
+5. **Be Consistent**: Follow a consistent format for log messages within the same component.
+
+6. **Use Context Loggers**: Create context-specific loggers for different parts of your application.
+
+7. **Log Request IDs**: Include request IDs in logs to trace requests across services.
+
+8. **Monitor Logs**: Set up monitoring to alert on critical errors or unusual log patterns.
+   
+9. **Use Log Rotation**: Configure log rotation to prevent log files from growing too large.
+
+10. **Use Async Logging**: Logging can be asynchronous, especially when using file transports.
+
+11. **Write Descriptive Messages**: Write clear and descriptive messages for easy understanding.
+
+## Advanced Usage
+
+### Custom Transports
+
+You can add custom transports to the logger by modifying the `production.ts` file:
+
+```typescript
+// Example: Adding Slack notifications for errors
+import { WebhookTransport } from 'winston-slack-webhook-transport';
+
+// In the createLogger method:
+transports: [
+  // ... existing transports
+  new WebhookTransport({
+    level: 'error',
+    webhookUrl: process.env.SLACK_WEBHOOK_URL,
+    channel: '#alerts',
+    username: 'ErrorBot',
+  })
+]
+```
+
+### Performance Monitoring
+
+For performance monitoring, use the logger with appropriate metadata:
+
+```typescript
+const startTime = Date.now();
+
+// Perform operation
+const result = await someExpensiveOperation();
+
+logger.info('Operation completed', { 
+  operation: 'someExpensiveOperation', 
+  duration_ms: Date.now() - startTime,
+  result_size: result.length
+});
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **High Log Volume**: If logs are growing too large, consider:
+   - Increasing the log rotation frequency
+   - Reducing debug logging in production
+   - Being more selective about what's logged at info level
+
+2. **Missing Context**: If logs are hard to trace, ensure you're using context loggers and including request IDs.
+
+3. **Performance Impact**: If logging is impacting performance, consider:
+   - Using async logging
+   - Logging less frequently
+   - Sampling logs for high-volume operations

@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Unauthorized from 'responses/client-errors/unauthorized';
 import BadRequest from 'responses/client-errors/bad-request';
 import { TokenErrorMessage } from 'common/enums/token-error.enum';
-import appConfig from 'server/configs/app.config';
+import appConfig from 'config/app-config';
 
 // Token types
 export enum TokenType {
@@ -82,12 +82,13 @@ export default class TokenService {
             aud: userId.toString(),
             jti,
             sub: username,
-            nbf: Date.now(),
+            // Set nbf to 5 seconds in the past to avoid clock skew issues
+            nbf: Date.now() - 5000,
             scopes: roles
         };
 
         // Generate access token
-        const accessToken = jwt.sign(tokenData, this.accessTokenSecret);
+        const accessToken = jwt.sign(tokenData, this.accessTokenSecret, { algorithm: 'HS256' });
 
         // Create refresh token data
         const refreshTokenData = {
@@ -96,7 +97,7 @@ export default class TokenService {
         };
 
         // Generate refresh token
-        const refreshToken = jwt.sign(refreshTokenData, this.refreshTokenSecret);
+        const refreshToken = jwt.sign(refreshTokenData, this.refreshTokenSecret, { algorithm: 'HS256' });
 
         // Store refresh token in database
         await this.saveRefreshToken(userId, refreshToken, refreshTokenData.exp);
@@ -118,20 +119,35 @@ export default class TokenService {
      */
     verifyAccessToken(token: string): IDecodedToken<TokenPayloadData> {
         try {
-            return jwt.verify(token, this.accessTokenSecret) as IDecodedToken<TokenPayloadData>;
+            // return jwt.verify(token, this.accessTokenSecret, { algorithms: ["HS256"] }) as IDecodedToken<TokenPayloadData>;
+            return jwt.verify(token, this.accessTokenSecret, { 
+                algorithms: ["HS256"],
+                ignoreNotBefore: true // Ignore the nbf claim to prevent NotBeforeError
+            }) as IDecodedToken<TokenPayloadData>;
         } catch (error) {
+            console.log("verifyAccessToken error:", error);
+            
             if (error instanceof TokenExpiredError) {
                 throw new Unauthorized(
                     'TOKEN_EXPIRED',
                     TokenErrorMessage.TOKEN_EXPIRED,
                     TokenErrorMessage.TOKEN_EXPIRED
                 );
+            } else if (error instanceof jwt.JsonWebTokenError) {
+                // Handle specific JsonWebTokenError (malformed, invalid signature, etc.)
+                throw new Unauthorized(
+                    'INVALID_TOKEN',
+                    TokenErrorMessage.INVALID_SIGNATURE,
+                    error.message || TokenErrorMessage.INVALID_SIGNATURE
+                );
+            } else {
+                // Handle any other unexpected errors
+                throw new Unauthorized(
+                    'INVALID_TOKEN',
+                    TokenErrorMessage.MALFORMED_TOKEN,
+                    error instanceof Error ? error.message : TokenErrorMessage.MALFORMED_TOKEN
+                );
             }
-            throw new Unauthorized(
-                'INVALID_TOKEN',
-                TokenErrorMessage.INVALID_SIGNATURE,
-                TokenErrorMessage.INVALID_SIGNATURE
-            );
         }
     }
 

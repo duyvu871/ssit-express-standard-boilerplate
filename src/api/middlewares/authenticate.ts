@@ -104,6 +104,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
             });
             next(new Unauthorized('TOKEN_EXPIRED', TokenErrorMessage.TOKEN_EXPIRED, TokenErrorMessage.TOKEN_EXPIRED));
         } else {
+            console.log("auth error:", error);
             
             logger.error('Authentication failed', { 
                 error: error instanceof Error ? error.message : 'Unknown error',
@@ -152,6 +153,7 @@ export const hasRoles = (roles: string[]) => {
                 userId: req.userId,
                 path: req.originalUrl
             });
+
             next(error);
         }
     };
