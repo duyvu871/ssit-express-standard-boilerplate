@@ -13,7 +13,8 @@ module.exports = {
         '^repository/(.*)$': '<rootDir>/src/repositories/$1',
         '^common/(.*)$': '<rootDir>/src/common/$1',
         '^responses/(.*)$': '<rootDir>/src/responses/$1',
-        '^services/(.*)$': '<rootDir>/src/api/services/$1'
+        '^services/(.*)$': '<rootDir>/src/api/services/$1',
+        "config/app-config": '<rootDir>/src/configs/app.config',
     },
     setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
     collectCoverage: true,
