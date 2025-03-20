@@ -1,0 +1,86 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check PR Title
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types:
+            - feat
+            - fix
+            - docs
+            - style
+            - refactor
+            - test
+            - chore
+          requireScope: false
+          subjectPattern: ^[A-Z].+$
+          subjectPatternError: |
+            The subject must begin with a capital letter.
+
+      - name: Check Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+
+      - name: Check if tests are added for features
+        if: contains(steps.changed-files.outputs.all_changed_files, 'src/')
+        run: |
+          if echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -q "^feat" && ! echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -q "^test"; then
+            echo "::warning::New features should include test coverage"
+          fi
+
+  size-check:
+    name: PR Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check PR size
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            const additions = response.data.additions;
+            const deletions = response.data.deletions;
+            const changedFiles = response.data.changed_files;
+            
+            console.log(`PR Stats: ${additions} additions, ${deletions} deletions, ${changedFiles} files changed`);
+            
+            if (additions > 1000) {
+              core.warning(`This PR is quite large (${additions} additions). Consider splitting it into smaller PRs if possible.`);
+            }
+            
+            if (changedFiles > 20) {
+              core.warning(`This PR changes ${changedFiles} files. Consider splitting it into smaller PRs for easier review.`);
+            } 

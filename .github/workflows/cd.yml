@@ -1,0 +1,103 @@
+# name: Continuous Deployment
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - develop
+#     tags:
+#       - 'v*'
+
+# jobs:
+#   deploy-staging:
+#     name: Deploy to Staging
+#     if: github.ref == 'refs/heads/develop'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '18'
+#           cache: 'npm'
+
+#       - name: Install dependencies
+#         run: npm ci
+
+#       - name: Build project
+#         run: npm run build
+#         env:
+#           NODE_ENV: production
+
+#       # Thay thế các bước deploy dưới đây với phương thức triển khai thực tế của bạn
+#       # Ví dụ: Sử dụng SSH để deploy, AWS Elastic Beanstalk, Heroku, Digital Ocean...
+#       - name: Deploy to Staging server
+#         run: echo "Deploying to staging environment"
+#         # Ví dụ với SSH:
+#         # uses: appleboy/ssh-action@master
+#         # with:
+#         #   host: ${{ secrets.STAGING_HOST }}
+#         #   username: ${{ secrets.STAGING_USER }}
+#         #   key: ${{ secrets.STAGING_SSH_KEY }}
+#         #   script: |
+#         #     cd /path/to/app
+#         #     git pull
+#         #     npm ci
+#         #     npm run build
+#         #     pm2 restart app
+
+#   deploy-production:
+#     name: Deploy to Production
+#     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '18'
+#           cache: 'npm'
+
+#       - name: Install dependencies
+#         run: npm ci
+
+#       - name: Build project
+#         run: npm run build
+#         env:
+#           NODE_ENV: production
+
+#       # Thay thế các bước deploy dưới đây với phương thức triển khai thực tế của bạn
+#       - name: Deploy to Production server
+#         run: echo "Deploying to production environment"
+#         # Ví dụ với Docker:
+#         # - name: Login to Docker Hub
+#         #   uses: docker/login-action@v2
+#         #   with:
+#         #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+#         #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+#         # 
+#         # - name: Build and push Docker image
+#         #   uses: docker/build-push-action@v3
+#         #   with:
+#         #     push: true
+#         #     tags: username/app-name:${{ github.ref_name }}
+
+#   notify:
+#     name: Notify Deployment Status
+#     needs: [deploy-staging, deploy-production]
+#     if: always()
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Notify team about deployment
+#         run: echo "Deployment completed with status ${{ job.status }}"
+#         # Thay thế với thông báo thực tế (Slack, Email, etc.)
+#         # Ví dụ với Slack:
+#         # uses: rtCamp/action-slack-notify@v2
+#         # env:
+#         #   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+#         #   SLACK_TITLE: Deployment Status
+#         #   SLACK_MESSAGE: "Deployment to ${{ github.ref_name }} completed with status: ${{ job.status }}" 
