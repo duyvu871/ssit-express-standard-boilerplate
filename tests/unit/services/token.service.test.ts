@@ -75,10 +75,11 @@ describe('TokenService', () => {
             // Assert
             expect(jwt.sign).toHaveBeenCalledTimes(2);
             expect(prisma.refreshToken.create).toHaveBeenCalledWith({
-                data: expect.objectContaining({
-                    token: mockRefreshToken,
+                data: {
+                    token: expect.any(String),
                     userId,
-                }),
+                    expiresAt: expect.any(Date)
+                }
             });
             expect(result).toEqual({
                 accessToken: mockAccessToken,
@@ -138,7 +139,7 @@ describe('TokenService', () => {
             const result = tokenService.verifyAccessToken(mockToken);
 
             // Assert
-            expect(jwt.verify).toHaveBeenCalledWith(mockToken, appConfig.jwtAccessSecret);
+            expect(jwt.verify).toHaveBeenCalledWith(mockToken, appConfig.jwtAccessSecret, {"algorithms": ["HS256"], "ignoreNotBefore": true});
             expect(result).toEqual(mockDecodedToken);
         });
 
@@ -152,7 +153,7 @@ describe('TokenService', () => {
 
             // Act & Assert
             expect(() => tokenService.verifyAccessToken(mockToken)).toThrow(Unauthorized);
-            expect(jwt.verify).toHaveBeenCalledWith(mockToken, appConfig.jwtAccessSecret);
+            expect(jwt.verify).toHaveBeenCalledWith(mockToken, appConfig.jwtAccessSecret, {"algorithms": ["HS256"], "ignoreNotBefore": true});
         });
 
         it('should throw Unauthorized error when token signature is invalid', () => {
@@ -163,7 +164,7 @@ describe('TokenService', () => {
 
             // Act & Assert
             expect(() => tokenService.verifyAccessToken(mockToken)).toThrow(Unauthorized);
-            expect(jwt.verify).toHaveBeenCalledWith(mockToken, appConfig.jwtAccessSecret);
+            expect(jwt.verify).toHaveBeenCalledWith(mockToken, appConfig.jwtAccessSecret, {"algorithms": ["HS256"], "ignoreNotBefore": true});
         });
     });
 
@@ -183,13 +184,24 @@ describe('TokenService', () => {
             nbf: 1600000000000,
             scopes: ['USER'],
         };
+        // Mock token hash that would be created by crypto.createHash('sha256').update(token).digest('hex')
+        const mockTokenHash = 'ba518c093e1e0df01cfe01436563cd37f6a1f47697fcc620e818a2d062665083';
+
+        // Mock crypto module
+        jest.mock('crypto', () => ({
+            createHash: jest.fn().mockReturnValue({
+                update: jest.fn().mockReturnValue({
+                    digest: jest.fn().mockReturnValue(mockTokenHash)
+                })
+            })
+        }));
 
         it('should return decoded token when token is valid and exists in database', async () => {
             // Arrange
             (jwt.verify as jest.Mock).mockReturnValue(mockDecodedToken);
             (prisma.refreshToken.findFirst as jest.Mock).mockResolvedValue({
                 id: 1,
-                token: mockToken,
+                token: mockTokenHash, // Use the hashed token value
                 userId: 1,
                 expiresAt: new Date(1600604800000),
                 createdAt: new Date(),
@@ -201,7 +213,7 @@ describe('TokenService', () => {
             // Assert
             expect(jwt.verify).toHaveBeenCalledWith(mockToken, appConfig.jwtRefreshSecret);
             expect(prisma.refreshToken.findFirst).toHaveBeenCalledWith({
-                where: { token: mockToken, userId: 1 },
+                where: { token: mockTokenHash, userId: 1 }, // Expect the hashed token
             });
             expect(result).toEqual(mockDecodedToken);
         });

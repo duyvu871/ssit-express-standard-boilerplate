@@ -11,7 +11,7 @@ import NotFound from 'responses/client-errors/not-found';
 import Unauthorized from 'responses/client-errors/unauthorized';
 import BadRequest from 'responses/client-errors/bad-request';
 import TokenService from 'services/token.service';
-import appConfig from 'server/configs/app.config';
+import appConfig from 'config/app-config';
 
 interface UserRegistrationData {
     username: string;
