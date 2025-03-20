@@ -48,7 +48,8 @@ describe('TokenService', () => {
         beforeEach(() => {
             // Mock JWT sign to return predictable tokens
             (jwt.sign as jest.Mock).mockImplementation((payload, secret, options) => {
-                if (options.expiresIn === appConfig.jwtAccessExpiry) {
+                // Check if this is for access token or refresh token based on the payload
+                if (secret === appConfig.jwtAccessSecret) {
                     return mockAccessToken;
                 } else {
                     return mockRefreshToken;
@@ -227,7 +228,7 @@ describe('TokenService', () => {
             await expect(tokenService.verifyRefreshToken(mockToken)).rejects.toThrow(Unauthorized);
             expect(jwt.verify).toHaveBeenCalledWith(mockToken, appConfig.jwtRefreshSecret);
             expect(prisma.refreshToken.findFirst).toHaveBeenCalledWith({
-                where: { token: mockToken, userId: 1 },
+                where: { token: mockTokenHash, userId: 1 },
             });
         });
 
