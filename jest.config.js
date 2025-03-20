@@ -7,6 +7,7 @@ module.exports = {
         '^.+\\.tsx?$': 'ts-jest'
     },
     moduleNameMapper: {
+        "config/app-config": '<rootDir>/src/configs/app.config',
         '^loader/(.*)$': '<rootDir>/src/loaders/$1',
         '^util/(.*)$': '<rootDir>/src/shared/utils/$1',
         '^config/(.*)$': '<rootDir>/src/configs/$1',
@@ -14,7 +15,6 @@ module.exports = {
         '^common/(.*)$': '<rootDir>/src/common/$1',
         '^responses/(.*)$': '<rootDir>/src/responses/$1',
         '^services/(.*)$': '<rootDir>/src/api/services/$1',
-        "config/app-config": '<rootDir>/src/configs/app.config',
     },
     setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
     collectCoverage: true,
