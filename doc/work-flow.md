@@ -25,8 +25,6 @@
 
 ### 1. Cấu trúc nhánh (Branching Strategy)
 
-Tôi đề xuất sử dụng mô hình Git Flow hoặc GitHub Flow:
-
 #### Git Flow
 
 - **master/main**: Nhánh chính, chỉ chứa code sẵn sàng để triển khai sản phẩm
@@ -362,7 +360,3 @@ g. **Công cụ hỗ trợ**:
 - Stand-up meeting hàng ngày (nếu làm việc nhóm)
 - Báo cáo tiến độ hàng tuần
 - Retrospective sau mỗi sprint/milestone
-
-Bạn có thể tạo file `doc/work-flow.md` với nội dung trên và thêm vào dự án của mình. Bạn cần chỉnh sửa để phù hợp với quy mô và yêu cầu cụ thể của dự án.
-
-Bạn có muốn tôi tạo file `doc/work-flow.md` với nội dung chi tiết hơn không? Hoặc bạn cần thêm thông tin về bất kỳ phần nào trong quy trình làm việc này?
