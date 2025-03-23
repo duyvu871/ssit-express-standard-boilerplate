@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodError, ZodType, ZodObject, ZodEffects } from 'zod';
-import { HttpStatusCode } from 'common/http-status-code';
+import { ZodError, ZodType } from 'zod';
 import BadRequest from 'responses/client-errors/bad-request';
 import logger from 'util/logger';
 import InternalServerError from 'responses/server-errors/internal-server-error';
