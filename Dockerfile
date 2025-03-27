@@ -12,8 +12,8 @@ COPY tsconfig*.json ./
 COPY prisma ./prisma
 
 # Install Node.js dependencies and build native modules
-RUN npm ci --build-from-source && \
-    npm rebuild bcrypt --build-from-source
+RUN npm ci --build-from-source --verbose --progress && \
+    npm rebuild bcrypt --build-from-source --verbose
 
 # Copy source files
 COPY . .

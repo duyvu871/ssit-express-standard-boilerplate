@@ -7,8 +7,8 @@ services:
         restart: unless-stopped
         env_file:
             - .env
-        # ports:
-        #     - '${DB_POSTGRES_PORT}:${DB_POSTGRES_PORT}'
+        ports:
+            - '5555:5432'
         environment:
             TZ: Asia/Ho_Chi_Minh
             POSTGRES_USER: ${DB_POSTGRES_USER}
