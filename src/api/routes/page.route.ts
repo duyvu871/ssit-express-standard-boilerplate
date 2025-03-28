@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { pageAuthenticate } from 'middlewares/page-authenticate';
 
 const pageRouter = Router();
 
@@ -10,9 +11,16 @@ pageRouter.get('/', (req, res) => {
 });
 
 // Dashboard page route
-pageRouter.get('/dashboard', (req, res) => {
+pageRouter.get('/dashboard', pageAuthenticate('/'), (req, res) => {
     res.render('dashboard', {
         title: 'User Dashboard'
+    });
+});
+
+// File Manager page route
+pageRouter.get('/file-manager', pageAuthenticate('/'), (req, res) => {
+    res.render('file-manager', {
+        title: 'File Manager'
     });
 });
 

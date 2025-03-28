@@ -187,6 +187,36 @@ CREATE TABLE "feedbacks" (
     CONSTRAINT "feedbacks_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "files" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "file_id" VARCHAR(255) NOT NULL,
+    "file_name" VARCHAR(255) NOT NULL,
+    "file_size" INTEGER NOT NULL,
+    "mime_type" VARCHAR(100) NOT NULL,
+    "object_key" VARCHAR(255) NOT NULL,
+    "metadata" JSONB,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "files_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "share_links" (
+    "id" SERIAL NOT NULL,
+    "file_id" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "token" VARCHAR(100) NOT NULL,
+    "expires_at" TIMESTAMP(3),
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "share_links_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 
@@ -201,6 +231,12 @@ CREATE UNIQUE INDEX "permissions_name_key" ON "permissions"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_profiles_user_id_key" ON "user_profiles"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "files_file_id_key" ON "files"("file_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "share_links_token_key" ON "share_links"("token");
 
 -- AddForeignKey
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -237,3 +273,12 @@ ALTER TABLE "payments" ADD CONSTRAINT "payments_user_id_fkey" FOREIGN KEY ("user
 
 -- AddForeignKey
 ALTER TABLE "feedbacks" ADD CONSTRAINT "feedbacks_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "files" ADD CONSTRAINT "files_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "share_links" ADD CONSTRAINT "share_links_file_id_fkey" FOREIGN KEY ("file_id") REFERENCES "files"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "share_links" ADD CONSTRAINT "share_links_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

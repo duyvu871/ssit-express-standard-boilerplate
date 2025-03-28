@@ -390,7 +390,7 @@ export default class TokenService {
      * @returns Expiry time in seconds
      * @private
      */
-    private parseExpiryTime(expiryString: string): number {
+    public parseExpiryTime(expiryString: string): number {
         const unit = expiryString.charAt(expiryString.length - 1);
         const value = parseInt(expiryString.slice(0, -1), 10);
 

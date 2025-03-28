@@ -1,14 +1,17 @@
 import { Request, Response } from 'express';
 import AuthService from 'services/auth.service';
+import TokenService from 'services/token.service';
 import AsyncMiddleware  from 'util/async-handler';
 import Success from 'server/responses/success-response/success';
 import { ChangePasswordBody, LoginBody, LogoutBody, RefreshTokenBody, RegisterBody, RequestPasswordResetBody, ResetPasswordBody } from 'validations/auth.validation';
+import appConfig from 'config/app.config';
 
 export class AuthController {
     private authService: AuthService;
-
+    private tokenService: TokenService;
     constructor() {
         this.authService = new AuthService();
+        this.tokenService = new TokenService();
     }
 
     /**
@@ -35,8 +38,18 @@ export class AuthController {
             const { username, password } = req.body;
             const result = await this.authService.login(username, password);
             const response = new Success(result).toJson;
-            console.log("login success", response);
-            
+            res.cookie('refreshToken', result.tokens.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: this.tokenService.parseExpiryTime(appConfig.jwtRefreshExpiry) * 1000,
+            });
+            res.cookie('accessToken', result.tokens.accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite:'strict',
+                maxAge: this.tokenService.parseExpiryTime(appConfig.jwtAccessExpiry) * 1000,
+            })
             return res.status(200).json(response);
         }
     );

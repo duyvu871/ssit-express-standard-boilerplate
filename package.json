@@ -22,12 +22,7 @@
         "build": "tsup && tsc-alias",
         "test": "jest",
         "postinstall": "prisma generate --schema=./prisma/schema.prisma",
-        "dev:migrate:up": "set NODE_ENV=development&&npx sequelize-cli db:migrate",
-        "dev:migrate:undo": "set NODE_ENV=development&&npx sequelize-cli db:migrate:undo",
-        "prod:migrate:up": "set NODE_ENV=production && npx sequelize-cli db:migrate",
-        "prod:migrate:undo": "set NODE_ENV=production && npx sequelize-cli db:migrate:undo",
-        "dev:seed:all": "npx sequelize-cli db:seed:all",
-        "dev:seed:undo": "npx sequelize-cli db:seed:undo"
+        "external:migrate": "prisma migrate deploy --schema=./prisma/schema.prisma --env-file .env"
     },
     "dependencies": {
         "@prisma/client": "^6.5.0",

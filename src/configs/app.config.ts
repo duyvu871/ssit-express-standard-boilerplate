@@ -48,7 +48,8 @@ process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "refresh-secr
 process.env.JWT_ACCESS_EXPIRY = process.env.JWT_ACCESS_EXPIRY || "15m"; // 15 minutes
 process.env.JWT_REFRESH_EXPIRY = process.env.JWT_REFRESH_EXPIRY || "7d"; // 7 days
 
-export default {
+
+const config = {
     // express server port
     isDev: process.env.NODE_ENV === "development",
     serverPort: parseInt(process.env.SERVER_PORT, 10),
@@ -85,4 +86,8 @@ export default {
     jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
     jwtAccessExpiry: process.env.JWT_ACCESS_EXPIRY,
     jwtRefreshExpiry: process.env.JWT_REFRESH_EXPIRY
-}
+};
+
+console.log('config', config);
+
+export default config;
