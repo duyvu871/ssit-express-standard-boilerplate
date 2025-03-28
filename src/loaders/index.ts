@@ -8,6 +8,7 @@ import RedisServer from 'loader/redis.loader';
 import SocketServer from 'loader/websocket.loader';
 import DatabaseSeeder from 'loader/database-seeder.loader';
 import logger from 'server/shared/utils/logger';
+import { MinioLoader } from 'loader/minio.loader';
 
 
 /**
@@ -30,6 +31,10 @@ export default async () => {
     } catch (error) {
         logger.error('Error during database seeding:', error);
     }
+
+    // initialize minio
+    const minioClient = new MinioLoader();
+    await minioClient.initialize();
 
     // start express
     const expressServer = new ExpressServer();

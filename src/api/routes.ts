@@ -10,7 +10,7 @@ const pageRouter = Router();
 
 apiRouter.use('/health', healthRoute);
 apiRouter.use('/auth', authRoute);
-apiRouter.use('/assets', assetUploadRouter);
+apiRouter.use('/asset', assetUploadRouter);
 
 pageRouter.use("/notification", notificationRouter);
 

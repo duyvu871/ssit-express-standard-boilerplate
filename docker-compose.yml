@@ -37,6 +37,8 @@ services:
     minio:
         image: 'minio/minio:latest'
         restart: unless-stopped
+        env_file:
+            - .env
         ports:
             - '${MINIO_PORT:-9000}:9000'
             - '${MINIO_CONSOLE_PORT:-9001}:9001'

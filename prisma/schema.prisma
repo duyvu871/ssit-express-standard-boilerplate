@@ -250,3 +250,4 @@ model Feedback {
 
     @@map("feedbacks")
 }
+

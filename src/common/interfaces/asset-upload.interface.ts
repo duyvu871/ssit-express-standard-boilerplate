@@ -10,19 +10,20 @@ export interface AssetUploadResponse {
         fileId: string;
         fileName: string;
         fileSize: number;
-        mimeType: string;
+        mimetype: string;
         url: string;
         metadata?: Record<string, unknown>;
     };
 }
 
 export type AssetMetadata = {
-    originalName: string;
+    original_name: string;
     size: number;
-    mimeType: string;
-    uploadedAt: Date;
-    lastModified?: Date;
-    metadata?: Record<string, unknown>;
+    mimetype: string;
+    uploaded_at: Date;
+    last_modified?: Date;
+    user_id: string | number;
+    metadata?: Record<string, unknown> | string;
 }
 
 export type GetFileByIdParams = {
@@ -36,9 +37,9 @@ export interface GetFileByIdResponse {
         fileId: string;
         fileName: string;
         fileSize: number;
-        mimeType: string;
+        mimetype: string;
         url: string;
-        metadata?: Record<string, unknown>;
+        metadata?: Record<string, unknown> | string;
         uploadedAt: Date;
         lastModified?: Date;
     };
