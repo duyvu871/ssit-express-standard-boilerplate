@@ -1,0 +1,28 @@
+ARG TZ=Asia/Ho_Chi_Minh
+# Stage 1: Use a Debian-based image to download and set up the timezone files
+FROM debian:latest AS builder
+ARG TZ
+ENV TZ=${TZ}
+
+# Install tzdata package and create necessary timezone files
+RUN apt-get update && \
+    apt-get install -y tzdata && \
+    ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && \
+    echo "${TZ}" > /etc/timezone
+
+# Stage 2: Start with the official MinIO image
+FROM minio/minio:latest
+ARG TZ
+ENV TZ=${TZ}
+# Copy timezone files from the builder stage
+COPY --from=builder /etc/localtime /etc/localtime
+COPY --from=builder /etc/timezone /etc/timezone
+COPY --from=builder /usr/share/zoneinfo/${TZ} /usr/share/zoneinfo/${TZ}
+
+# Set environment variable for the timezone
+
+# Expose the port MinIO uses
+EXPOSE 9000
+
+# Start MinIO server
+CMD ["minio", "server", "/data"]

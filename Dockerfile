@@ -1,7 +1,9 @@
 FROM node:lts-alpine
-
-# Install build dependencies
-RUN apk add --no-cache python3 make g++ gcc
+ENV TZ=Asia/Ho_Chi_Minh
+# Install build dependencies and timezone data
+RUN apk add --no-cache python3 make g++ gcc tzdata && \
+    cp /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime && \
+    echo "Asia/Ho_Chi_Minh" > /etc/timezone
 
 # Create App Directory
 WORKDIR /usr/src/app

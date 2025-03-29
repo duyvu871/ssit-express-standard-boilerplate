@@ -1,0 +1,127 @@
+/* GridJS Styles */
+.gridjs-wrapper {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.gridjs-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.gridjs-th {
+    padding: 12px;
+    background-color: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.gridjs-th:hover {
+    background-color: #f3f4f6;
+}
+
+.gridjs-td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+}
+
+.gridjs-tr:hover .gridjs-td {
+    background-color: #f9fafb;
+}
+
+.gridjs-search {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 14px;
+}
+
+.gridjs-search:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.gridjs-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.gridjs-pagination .gridjs-pages {
+    margin: 0;
+}
+
+.gridjs-pagination .gridjs-pages button {
+    padding: 8px 12px;
+    margin: 0 4px;
+    border: none;
+    background-color: #f3f4f6;
+    color: #374151;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gridjs-pagination .gridjs-pages button:hover {
+    background-color: #e5e7eb;
+}
+
+.gridjs-pagination .gridjs-pages button.gridjs-currentPage {
+    background-color: #2563eb;
+    color: white;
+}
+
+.gridjs-pagination .gridjs-pages button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.gridjs-footer {
+    padding: 12px;
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+.gridjs-loading {
+    opacity: 0.5;
+}
+
+.gridjs-loading-bar {
+    background-color: #2563eb;
+}
+
+/* Custom styles for file actions */
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.file-icon {
+    width: 2rem;
+    height: 2rem;
+    color: #6b7280;
+}
+
+.file-name {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.file-info {
+    color: #6b7280;
+    font-size: 0.875rem;
+}

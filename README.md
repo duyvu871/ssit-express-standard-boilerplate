@@ -21,6 +21,7 @@ A robust, production-ready Express.js server boilerplate with TypeScript, Prisma
 
 - Node.js (>=18)
 - Express.js
+- Alpinejs (for UI components)
 - TypeScript
 - Prisma ORM
 - PostgreSQL

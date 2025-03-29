@@ -11,7 +11,7 @@ import cookieParser from "cookie-parser";
 import errorHandler from "responses/error-handler.ts";
 import route from 'server/api/routes';
 import routeNotFound from 'middlewares/route-not-found';
-import {morganMiddleware} from "logger/morgan";
+import { morganMiddleware } from "logger/morgan";
 import { setupSwagger } from 'middlewares/swagger.middleware';
 
 import * as SocketIo from 'socket.io';
@@ -58,7 +58,7 @@ class ExpressServer {
 
         // Enable Cross-Origin Resource Sharing (CORS)
         this._app.use(cors());
-        
+
         // Parse Cookie headers
         this._app.use(cookieParser());
 
@@ -72,9 +72,11 @@ class ExpressServer {
         this._app.set('view engine', 'handlebars');
         this._app.set('views', path.join(process.cwd(), 'src/views'));
 
+        // static for ssr
+        this._app.use('/statics/script', express.static(path.join(process.cwd(),'src/views/scripts')));
+        this._app.use('/statics/style', express.static(path.join(process.cwd(), 'src/views/styles')));
         // Serve static files from the 'statics' directory
         this._app.use('/statics', express.static('statics'));
-
         // Serve static files from the 'storage' directory
         this._app.use('/storage', express.static('storage'));
 
@@ -92,7 +94,7 @@ class ExpressServer {
 
         // Setup Swagger documentation
         setupSwagger(this._app);
-        
+
         // Apply global error handling middleware
         this._app.use(errorHandler);
 

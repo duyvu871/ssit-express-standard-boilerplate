@@ -1,0 +1,68 @@
+/* Table styles */
+#fileTable {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+    margin-bottom: 1rem;
+}
+
+#fileTable th {
+    padding: 12px;
+    background-color: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#fileTable th:hover {
+    background-color: #f3f4f6;
+}
+
+#fileTable td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+}
+
+#fileTable tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+#fileSearch {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 14px;
+}
+
+#fileSearch:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.file-action-btn {
+    padding: 6px;
+    border-radius: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.file-action-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.file-action-btn.download {
+    color: #2563eb;
+}
+
+.file-action-btn.delete {
+    color: #dc2626;
+}

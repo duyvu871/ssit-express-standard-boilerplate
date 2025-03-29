@@ -31,11 +31,13 @@ export const storageConfig: StorageConfig = {
 };
 
 export const createMinioClient = (): Client => {
-    return new Client({
+    const client = new Client({
         endPoint: storageConfig.endPoint,
         port: storageConfig.port,
         useSSL: storageConfig.useSSL,
         accessKey: storageConfig.accessKey,
         secretKey: storageConfig.secretKey,
     });
+    // client.setRequestOptions({ signatureVersion: 'v4' });
+    return client;
 };
