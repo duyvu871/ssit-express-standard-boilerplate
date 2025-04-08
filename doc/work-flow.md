@@ -12,8 +12,9 @@
     - [2. Quy trình làm việc hàng ngày](#2-quy-trình-làm-việc-hàng-ngày)
     - [3. Quy ước commit](#3-quy-ước-commit)
     - [4. Quy trình review code](#4-quy-trình-review-code)
-    - [5. Quy trình release](#5-quy-trình-release)
-    - [6. Quy trình hotfix](#6-quy-trình-hotfix)
+    - [5. Quy trình merge code](#5-quy-trình-merge-code)
+    - [6. Quy trình release](#6-quy-trình-release)
+    - [7. Quy trình hotfix](#7-quy-trình-hotfix)
   - [Quy trình làm việc chung](#quy-trình-làm-việc-chung)
     - [1. Quản lý công việc](#1-quản-lý-công-việc)
     - [2. CI/CD](#2-cicd)
@@ -199,7 +200,172 @@ g. **Công cụ hỗ trợ**:
    - Tích hợp các công cụ kiểm tra tự động (SonarQube, CodeClimate...)
    - Sử dụng các mẫu (templates) cho PR và Review
 
-### 5. Quy trình release
+### 5. Quy trình merge code
+
+1. **Kiểm tra conflict trước khi commit**:
+   ```bash
+   # Cập nhật nhánh chính (develop hoặc main)
+   git checkout develop
+   git pull
+   
+   # Quay lại nhánh feature và kiểm tra xem có conflict không
+   git checkout feature/ten-tinh-nang
+   git merge develop --no-commit --no-ff
+   ```
+   
+   Nếu không có conflict, bạn sẽ thấy thông báo về các file đã được merge. Bạn có thể hủy merge tạm thời này bằng:
+   ```bash
+   git merge --abort
+   ```
+   
+   Sau đó tiếp tục làm việc và commit code của bạn.
+
+2. **Xử lý conflict khi merge**:
+
+   a. **Hiểu về conflict**:
+   - Conflict xảy ra khi cùng một dòng code bị thay đổi ở cả hai nhánh
+   - Git sẽ đánh dấu các vùng conflict trong file với cú pháp:
+     ```
+     <<<<<<< HEAD
+     Code từ nhánh hiện tại (HEAD)
+     =======
+     Code từ nhánh đang được merge vào
+     >>>>>>> branch-name
+     ```
+
+   b. **Các bước xử lý conflict**:
+   
+   1. **Xác định các file bị conflict**:
+      ```bash
+      git status
+      ```
+   
+   2. **Mở các file bị conflict và chỉnh sửa**:
+      - Xóa các marker conflict (<<<<<<, =======, >>>>>>>)
+      - Giữ lại code phù hợp hoặc kết hợp cả hai phiên bản
+      - Đảm bảo code vẫn hoạt động đúng sau khi sửa
+   
+   3. **Đánh dấu đã giải quyết conflict**:
+      ```bash
+      git add <file-đã-sửa-conflict>
+      ```
+   
+   4. **Hoàn tất quá trình merge**:
+      ```bash
+      git commit -m "Merge branch 'develop' into feature/ten-tinh-nang và giải quyết conflict"
+      ```
+
+   c. **Công cụ hỗ trợ xử lý conflict**:
+   - Sử dụng công cụ merge trong IDE (VS Code, IntelliJ, ...)
+   - Sử dụng công cụ merge của Git:
+     ```bash
+     git mergetool
+     ```
+
+3. **Revert code merge bị lỗi**:
+
+   a. **Revert commit merge gần nhất**:
+   ```bash
+   git reset --hard HEAD~1  # Quay lại commit trước merge
+   ```
+   
+   b. **Revert một commit merge cụ thể**:
+   ```bash
+   git revert -m 1 <commit-hash>  # -m 1 để giữ lại nhánh chính
+   ```
+   
+   c. **Hủy bỏ quá trình merge đang thực hiện**:
+   ```bash
+   git merge --abort
+   ```
+   
+   d. **Khôi phục về trạng thái trước khi merge (đã push)**:
+   ```bash
+   git reset --hard ORIG_HEAD
+   git push --force-with-lease  # Cẩn thận khi sử dụng force push
+   ```
+
+4. **Ví dụ về merge các nhánh**:
+
+   a. **Merge feature vào develop**:
+   ```bash
+   # Đảm bảo nhánh feature đã cập nhật mới nhất
+   git checkout feature/login
+   git pull origin feature/login
+   
+   # Cập nhật nhánh develop
+   git checkout develop
+   git pull origin develop
+   
+   # Merge feature vào develop
+   git merge --no-ff feature/login
+   
+   # Giải quyết conflict nếu có
+   # ...
+   
+   # Push lên remote
+   git push origin develop
+   ```
+
+   b. **Merge develop vào feature để cập nhật**:
+   ```bash
+   git checkout feature/payment-gateway
+   git pull origin feature/payment-gateway
+   
+   # Merge develop vào feature
+   git merge develop
+   
+   # Giải quyết conflict nếu có
+   # ...
+   
+   # Push lên remote
+   git push origin feature/payment-gateway
+   ```
+
+   c. **Merge release vào main và develop**:
+   ```bash
+   # Merge vào main
+   git checkout main
+   git pull origin main
+   git merge --no-ff release/1.2.0
+   git push origin main
+   
+   # Tạo tag cho phiên bản
+   git tag -a v1.2.0 -m "Version 1.2.0"
+   git push origin --tags
+   
+   # Merge ngược lại vào develop
+   git checkout develop
+   git pull origin develop
+   git merge --no-ff release/1.2.0
+   git push origin develop
+   ```
+
+   d. **Merge hotfix vào cả main và develop**:
+   ```bash
+   # Tạo nhánh hotfix từ main
+   git checkout main
+   git pull origin main
+   git checkout -b hotfix/security-issue
+   
+   # Thực hiện sửa lỗi
+   # ...
+   git commit -m "fix: sửa lỗi bảo mật nghiêm trọng"
+   
+   # Merge vào main
+   git checkout main
+   git merge --no-ff hotfix/security-issue
+   git tag -a v1.2.1 -m "Hotfix 1.2.1"
+   git push origin main --tags
+   
+   # Merge vào develop
+   git checkout develop
+   git pull origin develop
+   git merge --no-ff hotfix/security-issue
+   git push origin develop
+   ```
+
+### 6. Quy trình release
 
 1. **Chuẩn bị release** (sử dụng Git Flow):
    ```bash
@@ -299,7 +465,7 @@ g. **Công cụ hỗ trợ**:
    git push origin --delete release/1.0.0
    ```
 
-### 6. Quy trình hotfix
+### 7. Quy trình hotfix
 
 1. **Tạo nhánh hotfix từ main**:
    ```bash
